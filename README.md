@@ -119,7 +119,7 @@ swift rlhf \
 CUDA_VISIBLE_DEVICES=0 \
 swift rlhf \
     --rlhf_type grpo \
-    --model /data/wangzengbin/llm_workpath/base_model/Qwen2___5-3B-Instruct \
+    --model Qwen/Qwen2___5-3B-Instruct \
     --external_plugins examples/train/grpo/plugin/plugin.py \
     --reward_funcs external_math_acc external_math_format \
     --train_type lora \
@@ -158,11 +158,11 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
 NPROC_PER_NODE=8 \
 swift rlhf \
   --rlhf_type grpo \
-  --model /data/wangzengbin/llm_workpath/base_model/Qwen2___5_VL_3B_Instruct \
+  --model '../base_model/Qwen2___5_VL_3B_Instruct' \
   --train_type lora \
   --lora_rank 128 \
   --lora_alpha 256 \
-  --dataset '/data/wangzengbin/llm_workpath/base_data/lmms-lab___multimodal-open-r1-8k-verified#1000' \
+  --dataset '../base_data/lmms-lab___multimodal-open-r1-8k-verified#1000' \
   --external_plugins examples/train/grpo/plugin/plugin.py \
   --reward_funcs external_r1v_acc format \
   --reward_weights 1 0.1 \
