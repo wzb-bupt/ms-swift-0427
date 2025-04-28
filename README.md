@@ -34,7 +34,7 @@
 git clone https://github.com/modelscope/ms-swift.git
 cd ms-swift
 pip install -e .
-pip install deepspeed vllm math_verify trl==0.16
+pip install deepspeed vllm math-verify==0.5.2 trl==0.16
 ```
 
 ```shell
@@ -112,6 +112,40 @@ swift rlhf \
     --log_completions true
 ```
 
+```shell
+# GRPO Demo Math_Reward Bingo
+CUDA_VISIBLE_DEVICES=0 \
+swift rlhf \
+    --rlhf_type grpo \
+    --model /data/wangzengbin/llm_workpath/base_model/Qwen2___5-3B-Instruct \
+    --external_plugins examples/train/grpo/plugin/plugin.py \
+    --reward_funcs external_math_acc external_math_format \
+    --train_type lora \
+    --lora_rank 128 \
+    --lora_alpha 256 \
+    --target_modules all-linear \
+    --torch_dtype bfloat16 \
+    --dataset 'AI-MO/NuminaMath-TIR#1000' \
+    --max_completion_length 1024 \
+    --num_train_epochs 1 \
+    --per_device_train_batch_size 4 \
+    --per_device_eval_batch_size 4 \
+    --learning_rate 1e-5 \
+    --gradient_accumulation_steps 1 \
+    --eval_steps 100 \
+    --save_steps 100 \
+    --save_total_limit 1 \
+    --logging_steps 1 \
+    --max_length 2048 \
+    --output_dir output/GRPO_DEMO \
+    --warmup_ratio 0.05 \
+    --dataloader_num_workers 4 \
+    --dataset_num_proc 4 \
+    --num_generations 4 \
+    --temperature 0.9 \
+    --system 'examples/train/grpo/prompt.txt' \
+    --log_completions true
+```
 
 
 
