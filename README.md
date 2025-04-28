@@ -34,7 +34,9 @@
 git clone https://github.com/modelscope/ms-swift.git
 cd ms-swift
 pip install -e .
-pip install deepspeed vllm math-verify==0.5.2 trl==0.16
+pip install deepspeed vllm wandb math-verify==0.5.2 trl==0.16
+pip install "qwen_vl_utils>=0.0.6" "decord" -U`
+pip install flash-attn --no-build-isolation
 ```
 
 ```shell
@@ -147,6 +149,59 @@ swift rlhf \
     --log_completions true
 ```
 
+```shell
+## GRPO VL 
+export PYTHONWARNINGS="ignore"
+MAX_PIXELS=602112 \
+WANDB_API_KEY=xxx \
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+NPROC_PER_NODE=8 \
+swift rlhf \
+  --rlhf_type grpo \
+  --model /data/wangzengbin/llm_workpath/base_model/Qwen2___5_VL_3B_Instruct \
+  --train_type lora \
+  --lora_rank 128 \
+  --lora_alpha 256 \
+  --dataset '/data/wangzengbin/llm_workpath/base_data/lmms-lab___multimodal-open-r1-8k-verified#1000' \
+  --external_plugins examples/train/grpo/plugin/plugin.py \
+  --reward_funcs external_r1v_acc format \
+  --reward_weights 1 0.1 \
+  --torch_dtype bfloat16 \
+  --attn_impl flash_attn \
+  --num_train_epochs 1 \
+  --max_length 8192 \
+  --per_device_train_batch_size 1 \
+  --per_device_eval_batch_size 1 \
+  --gradient_accumulation_steps 1 \
+  --eval_steps 50 \
+  --save_steps 500 \
+  --learning_rate 1e-6 \
+  --save_total_limit 1 \
+  --logging_steps 1 \
+  --output_dir output/GRPO_VL \
+  --warmup_ratio 0.05 \
+  --dataloader_num_workers 4 \
+  --max_completion_length 2048 \
+  --num_generations 8 \
+  --use_vllm true \
+  --vllm_gpu_memory_utilization 0.5 \
+  --vllm_max_model_len 8192 \
+  --deepspeed zero3 \
+  --temperature 1.1 \
+  --top_p 1.0 \
+  --top_k 80 \
+  --log_completions true \
+  --num_infer_workers 8 \
+  --tensor_parallel_size 4 \
+  --async_generate false \
+  --offload_optimizer true \
+  --offload_model true \
+  --gc_collect_after_offload true \
+  --move_model_batches 40 \
+  --sleep_level 1 \
+  --report_to wandb \
+  --system examples/train/grpo/prompt.txt
+```
 
 
 
