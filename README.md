@@ -29,6 +29,97 @@
         <a href="https://arxiv.org/abs/2408.05517">Paper</a> &nbsp ｜ <a href="https://swift.readthedocs.io/en/latest/">English Documentation</a> &nbsp ｜ &nbsp <a href="https://swift.readthedocs.io/zh-cn/latest/">中文文档</a> &nbsp
 </p>
 
+## Install With Me (3090 version) ##
+```shell
+git clone https://github.com/modelscope/ms-swift.git
+cd ms-swift
+pip install -e .
+pip install deepspeed vllm math_verify trl==0.16
+```
+
+```shell
+## 22G 单卡训练自我认知 Bingo
+CUDA_VISIBLE_DEVICES=0 \
+swift sft \
+    --model Qwen/Qwen2___5-7B-Instruct \
+    --train_type lora \
+    --dataset 'AI-ModelScope/alpaca-gpt4-data-zh#500' \
+              'swift/self-cognition#500' \
+    --torch_dtype bfloat16 \
+    --num_train_epochs 1 \
+    --per_device_train_batch_size 1 \
+    --per_device_eval_batch_size 1 \
+    --learning_rate 1e-4 \
+    --lora_rank 8 \
+    --lora_alpha 32 \
+    --target_modules all-linear \
+    --gradient_accumulation_steps 16 \
+    --eval_steps 50 \
+    --save_steps 50 \
+    --save_total_limit 1 \
+    --logging_steps 1 \
+    --max_length 2048 \
+    --output_dir output/0_First_Test_ \
+    --system 'You are a helpful assistant.' \
+    --warmup_ratio 0.05 \
+    --dataloader_num_workers 4 \
+    --model_author watrix \
+    --model_name watrix-robot
+```
+
+```
+## GRPO Demo 8卡 (12G*8) Bingo
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+NPROC_PER_NODE=8 \
+swift rlhf \
+    --rlhf_type grpo \
+    --model Qwen/Qwen2___5-3B-Instruct \
+    --reward_funcs accuracy format \
+    --use_vllm true \
+    --vllm_device auto \
+    --vllm_gpu_memory_utilization 0.5 \
+    --vllm_max_model_len 8192 \
+    --num_infer_workers 8 \
+    --train_type lora \
+    --lora_rank 128 \
+    --lora_alpha 256 \
+    --torch_dtype bfloat16 \
+    --dataset 'AI-MO/NuminaMath-TIR#5000' \
+    --max_completion_length 2048 \
+    --num_train_epochs 1 \
+    --per_device_train_batch_size 1 \
+    --per_device_eval_batch_size 1 \
+    --learning_rate 1e-6 \
+    --gradient_accumulation_steps 2 \
+    --eval_steps 200 \
+    --save_steps 200 \
+    --save_total_limit 2 \
+    --logging_steps 1 \
+    --max_length 4096 \
+    --output_dir output/Demo_GRPO \
+    --warmup_ratio 0.05 \
+    --dataloader_num_workers 4 \
+    --dataset_num_proc 4 \
+    --num_generations 8 \
+    --temperature 0.9 \
+    --system 'examples/train/grpo/prompt.txt' \
+    --deepspeed zero2 \
+    --log_completions true \
+    --sleep_level 1 \
+    --offload_model true \
+    --offload_optimizer true \
+    --gc_collect_after_offload true \
+    --log_completions true
+```
+
+
+
+
+
+
+
+
+
 ## 📖 Table of Contents
 - [Groups](#-Groups)
 - [Introduction](#-introduction)
